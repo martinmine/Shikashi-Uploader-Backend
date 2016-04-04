@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D70B5923-98B8-4272-9E7B-ECB2D7C03FBB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{301BAA4C-1464-40A0-B96E-B619A7878008}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ShikashiAPI", "src\ShikashiAPI\ShikashiAPI.xproj", "{5C3CC09D-2CA1-4B10-8EB7-DD833EB8F246}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5C3CC09D-2CA1-4B10-8EB7-DD833EB8F246}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C3CC09D-2CA1-4B10-8EB7-DD833EB8F246}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C3CC09D-2CA1-4B10-8EB7-DD833EB8F246}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C3CC09D-2CA1-4B10-8EB7-DD833EB8F246}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5C3CC09D-2CA1-4B10-8EB7-DD833EB8F246} = {D70B5923-98B8-4272-9E7B-ECB2D7C03FBB}
+	EndGlobalSection
+EndGlobal
