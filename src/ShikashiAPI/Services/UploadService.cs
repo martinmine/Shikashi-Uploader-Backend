@@ -12,7 +12,6 @@ namespace ShikashiAPI.Services
     public class UploadService : IUploadService
     {
         private int padding;
-        private string hash;
 
         private PersistenceContext dbContext;
         private IHashids hashids;
@@ -22,7 +21,6 @@ namespace ShikashiAPI.Services
             this.dbContext = dbContext;
             this.hashids = hashids;
             this.padding = int.Parse(config["IdPadding"]);
-            this.hash = config["IdHash"];
         }
 
         public async Task<List<UploadedContent>> GetAllUploads(User owner)

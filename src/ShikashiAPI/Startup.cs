@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
 using ShikashiAPI.AuthenticatorMiddleware;
 using ShikashiAPI.Hashids.net;
-using ShikashiAPI.Model;
 using ShikashiAPI.Policies;
 using ShikashiAPI.Services;
 
@@ -32,13 +31,13 @@ namespace ShikashiAPI
         {
             // Add framework services.
 
-            services.AddSingleton<IHashids, ShikashiAPI.Hashids.net.Hashids>();
             services.AddSingleton<IKeyService, KeyService>();
             services.AddSingleton<IUserService, UserService>();
             services.AddSingleton<IUploadService, UploadService>();
             services.AddSingleton<IAuthorizationHandler, UserAuthorizationHandler>();
             services.AddSingleton<IS3Service, S3Service>();
             services.AddInstance<IConfiguration>(Configuration);
+            services.AddInstance<IHashids>(new Hashids.net.Hashids(Configuration["IdHash"]));
 
             services.AddMvc().AddJsonOptions(x =>
             {
@@ -51,13 +50,24 @@ namespace ShikashiAPI
                 {
                     options.UseNpgsql(Configuration["Database:ConnectionString"]);
                 });
+
+
+            services.AddCors(o => o.AddPolicy("AllowPanel", builder =>
+            {
+                builder.WithOrigins("http://panel.shikashi.me", "https://panel.shikashi.me")
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            }));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            loggerFactory.MinimumLevel = LogLevel.Warning;
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+
+            app.UseCors("AllowPanel");
 
             app.UseIISPlatformHandler();
 
