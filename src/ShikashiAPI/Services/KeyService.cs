@@ -49,8 +49,11 @@ namespace ShikashiAPI.Services
                 return null;
             }
 
+            long now = UnixTimestamp.Timestamp();
+            int keyId = int.Parse(authorizationKey[0]);
+
             return await (from p in dbContext.APIKey.Include(p => p.User)
-                          where p.Id == int.Parse(authorizationKey[0]) && p.Identifier == authorizationKey[1] && p.ExpirationTime > UnixTimestamp.Timestamp()
+                          where p.Id == keyId && p.Identifier == authorizationKey[1] && p.ExpirationTime > now
                           select p).SingleOrDefaultAsync();
         }
         

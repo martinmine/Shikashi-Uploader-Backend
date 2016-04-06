@@ -28,7 +28,7 @@ namespace ShikashiAPI.Controllers
                 return new ChallengeResult();
             }
 
-            var updatedUser = userService.SetUserPassword(key.User.Email, currentPassword, newPassword);
+            var updatedUser = await userService.SetUserPassword(key.User.Email, currentPassword, newPassword);
             if (updatedUser == null)
             {
                 return new HttpStatusCodeResult(406);

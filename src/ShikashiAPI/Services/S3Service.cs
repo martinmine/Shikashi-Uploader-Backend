@@ -39,10 +39,9 @@ namespace ShikashiAPI.Services
                     InputStream = new MemoryStream(new byte[] { })
                 };
 
-                putRequest.Metadata.Add("Content-Type", contentType);
-                putRequest.Metadata.Add("Content-Length", "0");
-                putRequest.Metadata.Add("x-amz-website-redirect-location", $"/{uploadId}");
-
+                putRequest.Headers["Content-Type"] = contentType;
+                putRequest.Headers["Content-Length"] = "0";
+                putRequest.Headers["x-amz-website-redirect-location"] = $"/{uploadId}";
 
                 var response = await client.PutObjectAsync(putRequest);
             }
@@ -67,9 +66,18 @@ namespace ShikashiAPI.Services
                     InputStream = stream
                 };
 
+
+                //putRequest.ContentType = contentType;
+
+                putRequest.Headers["Content-Type"] = contentType;
+                putRequest.Headers["Content-Disposition"] = $"inline; filename=\"{name}\"";
+                //putRequest.Headers["Content-Length"] = length.ToString();
+
+                /*
                 putRequest.Metadata.Add("Content-Type", contentType);
                 putRequest.Metadata.Add("Content-Length", length.ToString());
                 putRequest.Metadata.Add("Content-Disposition", $"inline; filename=\"{name}\"");
+                */
 
                 var response = await client.PutObjectAsync(putRequest);
 
