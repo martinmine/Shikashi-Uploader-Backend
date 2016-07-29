@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Http;
-using Microsoft.Data.Entity;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using ShikashiAPI.Model;
 using ShikashiAPI.Services;
 using System.Linq;

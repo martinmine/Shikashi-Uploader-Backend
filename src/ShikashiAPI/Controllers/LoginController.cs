@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNet.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShikashiAPI.Model;
 using ShikashiAPI.Services;
 using ShikashiAPI.ViewModels;
@@ -23,14 +23,14 @@ namespace ShikashiAPI.Controllers
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
-                return HttpBadRequest();
+                return BadRequest();
             }
 
             var user = await userService.LoginUser(email, password);
 
             if (user == null)
             {
-                return HttpNotFound();
+                return NotFound();
             }
             
             APIKey key = await keyService.CreateKey(user, client == "Shikashi-Win32");

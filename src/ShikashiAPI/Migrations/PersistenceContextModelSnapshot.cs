@@ -1,8 +1,8 @@
-using System;
-using Microsoft.Data.Entity;
-using Microsoft.Data.Entity.Infrastructure;
-using Microsoft.Data.Entity.Metadata;
-using Microsoft.Data.Entity.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using ShikashiAPI;
 
 namespace ShikashiAPI.Migrations
@@ -13,7 +13,7 @@ namespace ShikashiAPI.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.0-rc1-16348");
+                .HasAnnotation("ProductVersion", "1.0.0-rtm-21431");
 
             modelBuilder.Entity("ShikashiAPI.Model.APIKey", b =>
                 {
@@ -27,6 +27,10 @@ namespace ShikashiAPI.Migrations
                     b.Property<int?>("UserId");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("APIKey");
                 });
 
             modelBuilder.Entity("ShikashiAPI.Model.InviteKey", b =>
@@ -34,6 +38,8 @@ namespace ShikashiAPI.Migrations
                     b.Property<string>("Key");
 
                     b.HasKey("Key");
+
+                    b.ToTable("InviteKey");
                 });
 
             modelBuilder.Entity("ShikashiAPI.Model.UploadedContent", b =>
@@ -49,12 +55,15 @@ namespace ShikashiAPI.Migrations
 
                     b.Property<int?>("OwnerId");
 
-                    b.Property<DateTime>("Uploaded")
-                        .ValueGeneratedOnAdd();
+                    b.Property<DateTime>("Uploaded");
 
                     b.Property<string>("UploaderIP");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
+
+                    b.ToTable("UploadedContent");
                 });
 
             modelBuilder.Entity("ShikashiAPI.Model.User", b =>
@@ -62,7 +71,8 @@ namespace ShikashiAPI.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Email");
+                    b.Property<string>("Email")
+                        .IsRequired();
 
                     b.Property<string>("Password");
 
@@ -71,18 +81,20 @@ namespace ShikashiAPI.Migrations
                     b.HasKey("Id");
 
                     b.HasAlternateKey("Email");
+
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("ShikashiAPI.Model.APIKey", b =>
                 {
-                    b.HasOne("ShikashiAPI.Model.User")
+                    b.HasOne("ShikashiAPI.Model.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("ShikashiAPI.Model.UploadedContent", b =>
                 {
-                    b.HasOne("ShikashiAPI.Model.User")
+                    b.HasOne("ShikashiAPI.Model.User", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId");
                 });

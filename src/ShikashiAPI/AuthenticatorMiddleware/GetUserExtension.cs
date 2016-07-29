@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNet.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShikashiAPI.Model;
 using ShikashiAPI.Services;
 using System.Threading.Tasks;

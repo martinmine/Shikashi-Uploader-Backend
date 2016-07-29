@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ShikashiAPI.Policies;
 using ShikashiAPI.Services;
 using System.Threading.Tasks;
@@ -36,7 +36,7 @@ namespace ShikashiAPI.Controllers
 
             if (upload == null)
             {
-                HttpNotFound();
+                NotFound();
             }
 
             if (upload.Owner.Id != key.User.Id)
@@ -50,7 +50,7 @@ namespace ShikashiAPI.Controllers
             await s3Service.DeleteUpload(uploadService.GetIdHash(upload.Id));
             await s3Service.DeleteUpload($"{uploadService.GetIdHash(upload.Id)}.{extension}");
 
-            return new HttpStatusCodeResult(204);
+            return new StatusCodeResult(204);
         }
     }
 }

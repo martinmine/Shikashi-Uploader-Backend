@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.Entity;
+﻿using Microsoft.EntityFrameworkCore;
 using ShikashiAPI.Model;
 
 namespace ShikashiAPI
@@ -10,6 +10,9 @@ namespace ShikashiAPI
         public DbSet<UploadedContent> UploadedContent { get; set; }
         public DbSet<User> User { get; set; }
 
+        public PersistenceContext(DbContextOptions<PersistenceContext> options) : base(options)
+        { }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<APIKey>()
@@ -20,10 +23,7 @@ namespace ShikashiAPI
             
             modelBuilder.Entity<UploadedContent>()
                 .HasKey(p => p.Id);
-
-            modelBuilder.Entity<UploadedContent>()
-                .Property(p => p.Uploaded).ValueGeneratedOnAdd();
-
+            
             modelBuilder.Entity<User>()
                 .HasKey(p => p.Id);
 

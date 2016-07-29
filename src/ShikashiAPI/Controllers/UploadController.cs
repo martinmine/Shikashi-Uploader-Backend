@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
@@ -47,7 +47,7 @@ namespace ShikashiAPI.Controllers
             {
                 if (file == null || string.IsNullOrEmpty(HttpContext.Request.Headers["UploadFileSize"]) || file.Length > maxUploadSize)
                 {
-                    return HttpBadRequest();
+                    return BadRequest();
                 }
 
                 var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
@@ -70,7 +70,7 @@ namespace ShikashiAPI.Controllers
                 return Ok(viewModel);
             }
 
-            return HttpBadRequest();
+            return BadRequest();
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ShikashiAPI.Policies;
 using ShikashiAPI.Services;
 using System.Threading.Tasks;
@@ -31,7 +31,7 @@ namespace ShikashiAPI.Controllers
             var updatedUser = await userService.SetUserPassword(key.User.Email, currentPassword, newPassword);
             if (updatedUser == null)
             {
-                return new HttpStatusCodeResult(406);
+                return new StatusCodeResult(406);
             }
 
             return Ok();

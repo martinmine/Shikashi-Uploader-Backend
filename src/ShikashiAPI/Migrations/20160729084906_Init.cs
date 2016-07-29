@@ -1,6 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Microsoft.Data.Entity.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ShikashiAPI.Migrations
 {
@@ -18,13 +18,14 @@ namespace ShikashiAPI.Migrations
                 {
                     table.PrimaryKey("PK_InviteKey", x => x.Key);
                 });
+
             migrationBuilder.CreateTable(
                 name: "User",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:Serial", true),
-                    Email = table.Column<string>(nullable: true),
+                        .Annotation("Npgsql:ValueGeneratedOnAdd", true),
+                    Email = table.Column<string>(nullable: false),
                     Password = table.Column<string>(nullable: true),
                     PasswordSalt = table.Column<string>(nullable: true)
                 },
@@ -33,12 +34,13 @@ namespace ShikashiAPI.Migrations
                     table.PrimaryKey("PK_User", x => x.Id);
                     table.UniqueConstraint("AK_User_Email", x => x.Email);
                 });
+
             migrationBuilder.CreateTable(
                 name: "APIKey",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:Serial", true),
+                        .Annotation("Npgsql:ValueGeneratedOnAdd", true),
                     ExpirationTime = table.Column<long>(nullable: false),
                     Identifier = table.Column<string>(nullable: true),
                     UserId = table.Column<int>(nullable: true)
@@ -53,12 +55,13 @@ namespace ShikashiAPI.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
+
             migrationBuilder.CreateTable(
                 name: "UploadedContent",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:Serial", true),
+                        .Annotation("Npgsql:ValueGeneratedOnAdd", true),
                     FileName = table.Column<string>(nullable: true),
                     FileSize = table.Column<long>(nullable: false),
                     MimeType = table.Column<string>(nullable: true),
@@ -76,14 +79,31 @@ namespace ShikashiAPI.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_APIKey_UserId",
+                table: "APIKey",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UploadedContent_OwnerId",
+                table: "UploadedContent",
+                column: "OwnerId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable("APIKey");
-            migrationBuilder.DropTable("InviteKey");
-            migrationBuilder.DropTable("UploadedContent");
-            migrationBuilder.DropTable("User");
+            migrationBuilder.DropTable(
+                name: "APIKey");
+
+            migrationBuilder.DropTable(
+                name: "InviteKey");
+
+            migrationBuilder.DropTable(
+                name: "UploadedContent");
+
+            migrationBuilder.DropTable(
+                name: "User");
         }
     }
 }

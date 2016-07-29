@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNet.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShikashiAPI.Services;
 using System.Threading.Tasks;
 
@@ -19,24 +19,24 @@ namespace ShikashiAPI.Controllers
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(inviteKey))
             {
-                return HttpBadRequest();
+                return BadRequest();
             }
 
             if (password.Length < 5)
             {
-                return new HttpStatusCodeResult(406);
+                return new StatusCodeResult(406);
             }
 
             if (await userService.GetUser(email) != null)
             {
-                return new HttpStatusCodeResult(409);
+                return new StatusCodeResult(409);
             }
 
             var registeredUser = await userService.RegisterUser(email, password, inviteKey);
 
             if (registeredUser == null)
             {
-                return new HttpStatusCodeResult(403);
+                return new StatusCodeResult(403);
             }
 
             return Created("/", null);

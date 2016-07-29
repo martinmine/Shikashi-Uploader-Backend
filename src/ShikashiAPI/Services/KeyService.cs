@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.Entity;
+﻿using Microsoft.EntityFrameworkCore;
 using ShikashiAPI.Model;
 using System;
 using System.Linq;
