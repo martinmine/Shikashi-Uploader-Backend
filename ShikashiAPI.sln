@@ -1,16 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D70B5923-98B8-4272-9E7B-ECB2D7C03FBB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{301BAA4C-1464-40A0-B96E-B619A7878008}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ShikashiAPI", "src\ShikashiAPI\ShikashiAPI.xproj", "{5C3CC09D-2CA1-4B10-8EB7-DD833EB8F246}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShikashiAPI", "src\ShikashiAPI\ShikashiAPI.csproj", "{5C3CC09D-2CA1-4B10-8EB7-DD833EB8F246}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,5 +25,8 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5C3CC09D-2CA1-4B10-8EB7-DD833EB8F246} = {D70B5923-98B8-4272-9E7B-ECB2D7C03FBB}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EA1E748C-033C-4340-AD7B-EE9BF8BE79A9}
 	EndGlobalSection
 EndGlobal
