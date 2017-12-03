@@ -18,6 +18,9 @@ namespace ShikashiAPI
             modelBuilder.Entity<APIKey>()
                 .HasKey(p => p.Id);
 
+            modelBuilder.Entity<APIKey>()
+                .Property(p => p.Id).ValueGeneratedOnAdd();
+
             modelBuilder.Entity<InviteKey>()
                 .HasKey(p => p.Key);
             

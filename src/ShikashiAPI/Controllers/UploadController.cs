@@ -7,9 +7,7 @@ using Microsoft.Net.Http.Headers;
 using ShikashiAPI.Policies;
 using ShikashiAPI.Services;
 using ShikashiAPI.ViewModels;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ShikashiAPI.Controllers
@@ -38,7 +36,7 @@ namespace ShikashiAPI.Controllers
         {
             var key = await GetCurrentKey();
 
-            if (!await authorizationService.AuthorizeAsync(User, key, Operations.Create))
+            if (!(await authorizationService.AuthorizeAsync(User, key, Operations.Create)).Succeeded)
             {
                 return new ChallengeResult();
             }
@@ -50,7 +48,7 @@ namespace ShikashiAPI.Controllers
                     return BadRequest();
                 }
 
-                var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Value.Trim('"');
                 string ip = HttpContext.Connection.RemoteIpAddress?.ToString();
 
                 var upload = await uploadService.CreateUpload(file.ContentType, ip, fileName, null, file.Length);

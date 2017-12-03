@@ -30,7 +30,7 @@ namespace ShikashiAPI.Controllers
         public async Task<IActionResult> GetUploads()
         {
             var key = await GetCurrentKey();
-            if (!await authorizationService.AuthorizeAsync(User, key, Operations.Create))
+            if (!(await authorizationService.AuthorizeAsync(User, key, Operations.Create)).Succeeded)
             {
                 return new ChallengeResult();
             }

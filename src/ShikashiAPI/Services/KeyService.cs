@@ -50,7 +50,7 @@ namespace ShikashiAPI.Services
             }
 
             long now = UnixTimestamp.Timestamp();
-            int keyId = int.Parse(authorizationKey[0]);
+            long keyId = long.Parse(authorizationKey[0]);
 
             return await (from p in dbContext.APIKey.Include(p => p.User)
                           where p.Id == keyId && p.Identifier == authorizationKey[1] && p.ExpirationTime > now
