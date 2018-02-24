@@ -1,14 +1,20 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using ShikashiAPI.Policies;
 using ShikashiAPI.Services;
+using ShikashiAPI.Util;
 using ShikashiAPI.ViewModels;
-using System.Collections.Generic;
+using System;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Internal;
 
 namespace ShikashiAPI.Controllers
 {
@@ -21,7 +27,10 @@ namespace ShikashiAPI.Controllers
         private int maxUploadSize;
         private ILogger logger;
 
-        public UploadController(IConfiguration config, IUploadService uploadService, IKeyService keyService, IAuthorizationService authService, IS3Service s3Service, ILoggerFactory factory)
+        private static readonly FormOptions _defaultFormOptions = new FormOptions();
+
+        public UploadController(IConfiguration config, IUploadService uploadService, IKeyService keyService,
+            IAuthorizationService authService, IS3Service s3Service, ILoggerFactory factory)
             : base(keyService)
         {
             this.uploadService = uploadService;
@@ -32,8 +41,10 @@ namespace ShikashiAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadFile(ICollection<IFormFile> files)
+        public async Task<IActionResult> UploadFile()
         {
+            // [FromHeader(Name = "UploadFileSize")] long fileSize
+            var fileSize = int.Parse(Request.Headers["UploadFileSize"]);
             var key = await GetCurrentKey();
 
             if (!(await authorizationService.AuthorizeAsync(User, key, Operations.Create)).Succeeded)
@@ -41,34 +52,54 @@ namespace ShikashiAPI.Controllers
                 return new ChallengeResult();
             }
 
-            foreach (IFormFile file in files)
+            if (!MultipartRequestHelper.IsMultipartContentType(Request.ContentType))
             {
-                if (file == null || string.IsNullOrEmpty(HttpContext.Request.Headers["UploadFileSize"]) || file.Length > maxUploadSize)
-                {
-                    return BadRequest();
-                }
-
-                var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Value.Trim('"');
-                string ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-
-                var upload = await uploadService.CreateUpload(file.ContentType, ip, fileName, null, file.Length);
-
-                await s3Service.StoreUpload(file.OpenReadStream(), uploadService.GetIdHash(upload.Id), file.ContentType, file.Length, fileName);
-                await s3Service.CreateUploadAlias(uploadService.GetIdHash(upload.Id), file.ContentType, fileName);
-
-                UploadViewModel viewModel = new UploadViewModel
-                {
-                    FileName = upload.FileName,
-                    FileSize = upload.FileSize,
-                    Key = uploadService.GetIdHash(upload.Id),
-                    MimeType = upload.MimeType,
-                    Uploaded = upload.Uploaded
-                };
-
-                return Ok(viewModel);
+                return BadRequest($"Expected a multipart request, but got {Request.ContentType}");
             }
 
-            return BadRequest();
+            var boundary = MultipartRequestHelper.GetBoundary(
+                    MediaTypeHeaderValue.Parse(Request.ContentType),
+                    _defaultFormOptions.MultipartBoundaryLengthLimit);
+            var reader = new MultipartReader(boundary, HttpContext.Request.Body);
+
+
+            var section = await reader.ReadNextSectionAsync();
+
+            if (section == null)
+                return BadRequest();
+
+            var hasContentDispositionHeader = ContentDispositionHeaderValue.TryParse(section.ContentDisposition, out var contentDisposition);
+
+            if (!hasContentDispositionHeader || !MultipartRequestHelper.HasFileContentDisposition(contentDisposition))
+                return BadRequest();
+
+            var ip = GetIPAddress();
+            var file = section.AsFileSection();
+
+            var upload = await uploadService.CreateUpload(section.ContentType, ip, file.FileName, key.User, fileSize);
+
+            await s3Service.StoreUpload(new MultipartStreamWrapper(file.FileStream, fileSize), uploadService.GetIdHash(upload.Id), section.ContentType, file.FileName, fileSize);
+            await s3Service.CreateUploadAlias(uploadService.GetIdHash(upload.Id), section.ContentType, file.FileName);
+
+            // TODO: Avoid using the filesize header as this is a naive approach which can easily be bypassed 
+            return Ok(new UploadViewModel
+            {
+                FileName = upload.FileName,
+                FileSize = upload.FileSize,
+                Key = uploadService.GetIdHash(upload.Id),
+                MimeType = upload.MimeType,
+                Uploaded = upload.Uploaded
+            });
+        }
+
+        private string GetIPAddress()
+        {
+            const string proxyForwardingHeader = "X-Forwarded-For";
+
+            if (HttpContext.Request.Headers.ContainsKey(proxyForwardingHeader))
+                return HttpContext.Request.Headers[proxyForwardingHeader];
+            else
+                return HttpContext.Connection.RemoteIpAddress?.ToString();
         }
     }
 }

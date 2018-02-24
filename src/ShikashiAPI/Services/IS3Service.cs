@@ -7,7 +7,7 @@ namespace ShikashiAPI.Services
     {
         Task DeleteUpload(string uploadId);
 
-        Task<long> StoreUpload(Stream stream, string uploadId, string contentType, long length, string name);
+        Task<long> StoreUpload(Stream stream, string uploadId, string contentType, string name, int contentLength);
 
         Task CreateUploadAlias(string uploadId, string contentType, string uploadName);
     }

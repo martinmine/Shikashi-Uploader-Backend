@@ -27,7 +27,7 @@ namespace ShikashiAPI.Services
         public async Task<User> LoginUser(string email, string password)
         {
             User user = await GetUser(email);
-            if (user != null && BCrypt.Net.BCrypt.CheckPassword(password + passwordPepper, user.Password))
+            if (user != null && BCrypt.Net.BCrypt.Verify(password + passwordPepper, user.Password))
             {
                 return user;
             }

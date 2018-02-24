@@ -1,4 +1,5 @@
-﻿using Amazon;
+﻿using System;
+using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
@@ -55,30 +56,34 @@ namespace ShikashiAPI.Services
             }
         }
 
-        public async Task<long> StoreUpload(Stream stream, string uploadId, string contentType, long length, string name)
+        public async Task<long> StoreUpload(Stream stream, string uploadId, string contentType, string name, int length)
         {
             using (var client = new AmazonS3Client(credentials, region))
             {
-                PutObjectRequest putRequest = new PutObjectRequest()
+                var putRequest = new PutObjectRequest
                 {
                     BucketName = bucketName,
                     Key = uploadId,
-                    InputStream = stream
+                    InputStream = stream,
+                    Headers =
+                    {
+                        ["Content-Type"] = contentType,
+                        ["Content-Disposition"] = $"inline; filename=\"{name}\"",
+                        ["Content-Length"] = $"{length}"
+                    }
                 };
 
 
                 //putRequest.ContentType = contentType;
 
-                putRequest.Headers["Content-Type"] = contentType;
-                putRequest.Headers["Content-Disposition"] = $"inline; filename=\"{name}\"";
-                //putRequest.Headers["Content-Length"] = length.ToString();
+                //  putRequest.Headers["Content-Length"] = $"{length}";
 
                 /*
                 putRequest.Metadata.Add("Content-Type", contentType);
                 putRequest.Metadata.Add("Content-Length", length.ToString());
                 putRequest.Metadata.Add("Content-Disposition", $"inline; filename=\"{name}\"");
                 */
-
+                
                 var response = await client.PutObjectAsync(putRequest);
 
                 return response.ContentLength;
