@@ -98,10 +98,12 @@ namespace IntegrationTests
         private async Task<UploadViewModel> UploadFile(string filePath)
         {
             var testFile = File.OpenRead(filePath);
+            var fileInfo = new FileInfo(filePath);
             var extension = Path.GetExtension(filePath);
             var contentType = MimeMapping.Instance.GetMimeType(extension);
 
-            _client.DefaultRequestHeaders.Add("UploadFileSize", testFile.Length.ToString());
+            _client.DefaultRequestHeaders.Remove("UploadFileSize");
+            _client.DefaultRequestHeaders.Add("UploadFileSize", fileInfo.Length.ToString());
 
             using (var content = new MultipartFormDataContent())
             {
