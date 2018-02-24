@@ -46,6 +46,7 @@ namespace ShikashiAPI
 
         public override int Read(byte[] buffer, int offset, int count)
         {
+            GC.Collect();
             return _inner.Read(buffer, offset, count);
         }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using ShikashiAPI.Services;
 using System.Threading.Tasks;
 
@@ -7,11 +8,13 @@ namespace ShikashiAPI.Controllers
     [Route("/register")]
     public class RegisterController : Controller
     {
-        private IUserService userService;
+        private readonly IUserService _userService;
+        private readonly ILogger<RegisterController> _logger;
 
-        public RegisterController(IUserService userService)
+        public RegisterController(IUserService userService, ILogger<RegisterController> logger)
         {
-            this.userService = userService;
+            _userService = userService;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -27,17 +30,19 @@ namespace ShikashiAPI.Controllers
                 return new StatusCodeResult(406);
             }
 
-            if (await userService.GetUser(email) != null)
+            if (await _userService.GetUser(email) != null)
             {
                 return new StatusCodeResult(409);
             }
 
-            var registeredUser = await userService.RegisterUser(email, password, inviteKey);
+            var registeredUser = await _userService.RegisterUser(email, password, inviteKey);
 
             if (registeredUser == null)
             {
                 return new StatusCodeResult(403);
             }
+
+            _logger.LogInformation("Registered user with email {@Email} and inv key {@InviteKey}", email, inviteKey);
 
             return Created("/", null);
         }

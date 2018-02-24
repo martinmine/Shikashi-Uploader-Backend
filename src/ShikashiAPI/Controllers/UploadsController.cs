@@ -4,9 +4,7 @@ using ShikashiAPI.Model;
 using ShikashiAPI.Policies;
 using ShikashiAPI.Services;
 using ShikashiAPI.ViewModels;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ShikashiAPI.Controllers
@@ -14,28 +12,26 @@ namespace ShikashiAPI.Controllers
     [Route("/account/uploads")]
     public class UploadsController : UserAuthenticatedController
     {
-        private IUserService userService;
-        private IAuthorizationService authorizationService;
-        private IUploadService uploadService;
+        private readonly IAuthorizationService _authorizationService;
+        private readonly IUploadService _uploadService;
 
-        public UploadsController(IUserService userService, IKeyService keyService, IAuthorizationService authService, IUploadService uploadService)
+        public UploadsController(IKeyService keyService, IAuthorizationService authService, IUploadService uploadService)
             : base(keyService)
         {
-            this.userService = userService;
-            this.authorizationService = authService;
-            this.uploadService = uploadService;
+            this._authorizationService = authService;
+            this._uploadService = uploadService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetUploads()
         {
             var key = await GetCurrentKey();
-            if (!(await authorizationService.AuthorizeAsync(User, key, Operations.Create)).Succeeded)
+            if (!(await _authorizationService.AuthorizeAsync(User, key, Operations.Create)).Succeeded)
             {
                 return new ChallengeResult();
             }
 
-            var uploads = await uploadService.GetAllUploads(key.User);
+            var uploads = await _uploadService.GetAllUploads(key.User);
 
             List<UploadViewModel> models = new List<UploadViewModel>();
 
@@ -47,7 +43,7 @@ namespace ShikashiAPI.Controllers
                     FileSize = upload.FileSize,
                     MimeType = upload.MimeType,
                     Uploaded = upload.Uploaded,
-                    Key = uploadService.GetIdHash(upload.Id)
+                    Key = _uploadService.GetIdHash(upload.Id)
                 });
             }
 

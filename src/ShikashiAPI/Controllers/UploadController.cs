@@ -4,13 +4,15 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using ShikashiAPI.Policies;
 using ShikashiAPI.Services;
 using ShikashiAPI.Util;
 using ShikashiAPI.ViewModels;
+using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using ILogger = Serilog.ILogger;
 
 namespace ShikashiAPI.Controllers
 {
@@ -21,19 +23,19 @@ namespace ShikashiAPI.Controllers
         private readonly IAuthorizationService _authorizationService;
         private readonly IS3Service _s3Service;
         private readonly int _maxUploadSize;
-        private readonly ILogger _logger;
+        private readonly ILogger<UploadController> _logger;
 
         private static readonly FormOptions DefaultFormOptions = new FormOptions();
 
         public UploadController(IConfiguration config, IUploadService uploadService, IKeyService keyService,
-            IAuthorizationService authService, IS3Service s3Service, ILoggerFactory factory)
+            IAuthorizationService authService, IS3Service s3Service, ILogger<UploadController> logger)
             : base(keyService)
         {
             _uploadService = uploadService;
             _authorizationService = authService;
             _maxUploadSize = int.Parse(config["MaxFileSize"]);
             _s3Service = s3Service;
-            _logger = factory.CreateLogger<UploadController>();
+            _logger = logger;
         }
 
         [HttpPost]
@@ -51,7 +53,7 @@ namespace ShikashiAPI.Controllers
             {
                 return BadRequest($"Expected a multipart request, but got {Request.ContentType}");
             }
-
+            
             var boundary = MultipartRequestHelper.GetBoundary(
                     MediaTypeHeaderValue.Parse(Request.ContentType),
                     DefaultFormOptions.MultipartBoundaryLengthLimit);
@@ -71,10 +73,20 @@ namespace ShikashiAPI.Controllers
             var ip = GetIpAddress();
             var file = section.AsFileSection();
 
+            _logger.LogInformation("Attempting to create upload with filename {@FileName} which is {@ContentType} with {@Size} length",
+                file.FileName, section.ContentType, fileSize);
+
             var upload = await _uploadService.CreateUpload(section.ContentType, ip, file.FileName, key.User, fileSize);
+
+            using (var stream = new FileStream("t.obj", FileMode.Create))
+            {
+                await file.FileStream.CopyToAsync(stream);
+            }
 
             await _s3Service.StoreUpload(new MultipartStreamWrapper(file.FileStream, fileSize), _uploadService.GetIdHash(upload.Id), section.ContentType, file.FileName, fileSize);
             await _s3Service.CreateUploadAlias(_uploadService.GetIdHash(upload.Id), section.ContentType, file.FileName);
+
+            _logger.LogInformation("Uploaded compelted {@Upload}", upload);
 
             // TODO: Avoid using the filesize header as this is a naive approach which can easily be bypassed 
             return Ok(new UploadViewModel
