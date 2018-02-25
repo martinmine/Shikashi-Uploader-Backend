@@ -53,6 +53,11 @@ namespace ShikashiAPI.Controllers
             {
                 return BadRequest($"Expected a multipart request, but got {Request.ContentType}");
             }
+
+            if (_maxUploadSize < fileSize)
+            {
+                return BadRequest("Request too large");
+            }
             
             var boundary = MultipartRequestHelper.GetBoundary(
                     MediaTypeHeaderValue.Parse(Request.ContentType),
