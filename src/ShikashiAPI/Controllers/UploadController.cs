@@ -73,30 +73,25 @@ namespace ShikashiAPI.Controllers
             var ip = GetIpAddress();
             var file = section.AsFileSection();
 
-            _logger.LogInformation("Attempting to create upload with filename {@FileName} which is {@ContentType} with {@Size} length",
-                file.FileName, section.ContentType, fileSize);
+            _logger.LogInformation("Attempting to create upload with filename {@FileName} which is {@ContentType} with {@Size} length for user {@UserId} at {@Ip}",
+                file.FileName, section.ContentType, fileSize, key.User.Id, ip);
 
             var upload = await _uploadService.CreateUpload(section.ContentType, ip, file.FileName, key.User, fileSize);
-
-            using (var stream = new FileStream("t.obj", FileMode.Create))
-            {
-                await file.FileStream.CopyToAsync(stream);
-            }
 
             await _s3Service.StoreUpload(new MultipartStreamWrapper(file.FileStream, fileSize), _uploadService.GetIdHash(upload.Id), section.ContentType, file.FileName, fileSize);
             await _s3Service.CreateUploadAlias(_uploadService.GetIdHash(upload.Id), section.ContentType, file.FileName);
 
-            _logger.LogInformation("Uploaded compelted {@Upload}", upload);
-
-            // TODO: Avoid using the filesize header as this is a naive approach which can easily be bypassed 
-            return Ok(new UploadViewModel
+            var viewModel = new UploadViewModel
             {
                 FileName = upload.FileName,
                 FileSize = upload.FileSize,
                 Key = _uploadService.GetIdHash(upload.Id),
                 MimeType = upload.MimeType,
                 Uploaded = upload.Uploaded
-            });
+            };
+
+            _logger.LogInformation("Uploaded compelted {@Upload}", viewModel);
+            return Ok(viewModel);
         }
 
         private string GetIpAddress()
