@@ -55,7 +55,7 @@ namespace ShikashiAPI.Controllers
             await _s3Service.DeleteUpload(_uploadService.GetIdHash(upload.Id));
             await _s3Service.DeleteUpload($"{_uploadService.GetIdHash(upload.Id)}.{extension}");
 
-            _logger.LogInformation("User {@User} deleted upload {@UploadKey}",
+            _logger.LogInformation("User {@User} deleted upload {@UploadKey} with owner {@OwnerId}",
                 key.User.Id, uploadKey, upload.Owner.Id);
 
             return new StatusCodeResult(204);

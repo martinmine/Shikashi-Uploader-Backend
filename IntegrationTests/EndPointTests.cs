@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using ShikashiAPI;
 using ShikashiAPI.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -30,9 +33,15 @@ namespace IntegrationTests
         [OneTimeSetUp]
         public async Task Initialize()
         {
-            _server = new TestServer(new WebHostBuilder()
-                .UseStartup<Startup>());
-            _client = _server.CreateClient();
+            var application = new WebApplicationFactory<Startup>()
+             .WithWebHostBuilder(builder =>
+             {
+                 builder.UseConfiguration(new ConfigurationBuilder()
+                    .AddJsonFile("appsettings2.json")
+                    .Build());
+             });
+
+            _client = application.CreateClient();
 
             var token = await GetToken(TestUserEmail, TestUserPassword);
 
@@ -50,11 +59,13 @@ namespace IntegrationTests
 
             var content = new FormUrlEncodedContent(formData);
 
-            using (var response = await _client.PostAsync("/login", content))
-            {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<APIKeyViewModel>(responseContent);
-            }
+            using var response = await _client.PostAsync("/login", content);
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            if (response.StatusCode != HttpStatusCode.OK)
+                throw new Exception($"Expected HTTP OK response but got {response.StatusCode}: {responseContent}");
+
+            return JsonConvert.DeserializeObject<APIKeyViewModel>(responseContent);
         }
 
         [Test]

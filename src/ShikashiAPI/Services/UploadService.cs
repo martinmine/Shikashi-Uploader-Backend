@@ -68,7 +68,7 @@ namespace ShikashiAPI.Services
                 MimeType = contentType,
                 Owner = owner,
                 UploaderIP = ipAddress,
-                Uploaded = DateTime.Now
+                Uploaded = DateTime.UtcNow
             };
 
             dbContext.UploadedContent.Add(upload);

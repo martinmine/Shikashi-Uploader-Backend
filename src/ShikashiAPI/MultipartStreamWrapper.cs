@@ -125,6 +125,7 @@ namespace ShikashiAPI
             _inner.WriteByte(value);
         }
 
+        [Obsolete]
         public override object InitializeLifetimeService()
         {
             return _inner.InitializeLifetimeService();
