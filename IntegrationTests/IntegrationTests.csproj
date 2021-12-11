@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\ShikashiAPI\ShikashiAPI.csproj" />
+    <ProjectReference Include="..\ShikashiAPI\ShikashiAPI.csproj" />
   </ItemGroup>
 
   <ItemGroup>
