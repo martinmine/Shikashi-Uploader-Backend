@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ShikashiAPI.Model;
 using ShikashiAPI.Policies;
 using ShikashiAPI.Services;
 using ShikashiAPI.ViewModels;
@@ -33,9 +32,9 @@ namespace ShikashiAPI.Controllers
 
             var uploads = await _uploadService.GetAllUploads(key.User);
 
-            List<UploadViewModel> models = new List<UploadViewModel>();
+            var models = new List<UploadViewModel>();
 
-            foreach (UploadedContent upload in uploads)
+            foreach (var upload in uploads)
             {
                 models.Add(new UploadViewModel
                 {

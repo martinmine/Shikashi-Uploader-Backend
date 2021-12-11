@@ -9,10 +9,8 @@ using ShikashiAPI.Policies;
 using ShikashiAPI.Services;
 using ShikashiAPI.Util;
 using ShikashiAPI.ViewModels;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using ILogger = Serilog.ILogger;
 
 namespace ShikashiAPI.Controllers
 {
@@ -38,7 +36,8 @@ namespace ShikashiAPI.Controllers
             _logger = logger;
         }
 
-        [HttpPost, DisableRequestSizeLimit]
+        [HttpPost]
+        [DisableRequestSizeLimit]
         public async Task<IActionResult> UploadFile()
         {
             var fileSize = int.Parse(Request.Headers["UploadFileSize"]);

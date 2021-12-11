@@ -50,7 +50,7 @@ namespace ShikashiAPI.Services
         {
             return (from p in dbContext.UploadedContent.Include(p => p.Owner)
                     where p.Id == GetId(uploadId)
-                    select p).SingleOrDefaultAsync();
+                    select p).FirstOrDefaultAsync();
         }
 
         public async Task RemoveUpload(UploadedContent upload)

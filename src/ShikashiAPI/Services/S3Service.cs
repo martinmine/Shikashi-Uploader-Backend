@@ -1,5 +1,4 @@
-﻿using System;
-using Amazon;
+﻿using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
@@ -70,7 +69,9 @@ namespace ShikashiAPI.Services
                         ["Content-Type"] = contentType,
                         ["Content-Disposition"] = $"inline; filename=\"{name}\"",
                         ["Content-Length"] = $"{length}"
-                    }
+                    },
+                    DisablePayloadSigning = true,
+                    DisableMD5Stream = true
                 };
 
 

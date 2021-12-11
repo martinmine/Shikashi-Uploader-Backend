@@ -21,7 +21,7 @@ namespace ShikashiAPI.Services
         {
             return await (from p in dbContext.User
                           where p.Email == email
-                          select p).SingleOrDefaultAsync();
+                          select p).FirstOrDefaultAsync();
         }
 
         public async Task<User> LoginUser(string email, string password)
@@ -39,7 +39,7 @@ namespace ShikashiAPI.Services
         {
             var key = await (from p in dbContext.InviteKey
                              where p.Key == inviteKey
-                             select p).SingleOrDefaultAsync();
+                             select p).FirstOrDefaultAsync();
 
             if (key == null)
             {

@@ -54,7 +54,7 @@ namespace ShikashiAPI.Services
 
             return await (from p in dbContext.APIKey.Include(p => p.User)
                           where p.Id == keyId && p.Identifier == authorizationKey[1] && p.ExpirationTime > now
-                          select p).SingleOrDefaultAsync();
+                          select p).FirstOrDefaultAsync();
         }
         
         private string GetUniqueKey(int maxSize)
