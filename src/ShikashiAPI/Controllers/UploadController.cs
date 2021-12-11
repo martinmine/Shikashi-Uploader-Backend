@@ -38,7 +38,7 @@ namespace ShikashiAPI.Controllers
             _logger = logger;
         }
 
-        [HttpPost]
+        [HttpPost, DisableRequestSizeLimit]
         public async Task<IActionResult> UploadFile()
         {
             var fileSize = int.Parse(Request.Headers["UploadFileSize"]);
