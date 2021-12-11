@@ -6,6 +6,14 @@ using System.Threading.Tasks;
 
 namespace ShikashiAPI.Services
 {
+    public interface IUserService
+    {
+        Task<User> RegisterUser(string email, string password, string inviteKey);
+        Task<User> LoginUser(string email, string password);
+        Task<User> GetUser(string email);
+        Task<User> SetUserPassword(string email, string currentPassword, string newPassword);
+    }
+
     public class UserService : IUserService
     {
         private PersistenceContext dbContext;

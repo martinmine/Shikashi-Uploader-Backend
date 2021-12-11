@@ -1,11 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShikashiAPI.Model;
+using ShikashiAPI.Util;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ShikashiAPI.Services
 {
+    public interface IKeyService
+    {
+        Task<APIKey> GetKey(string authToken);
+        Task<APIKey> CreateKey(User user, bool permanent);
+    }
+
     public class KeyService : IKeyService
     {
         private PersistenceContext dbContext;

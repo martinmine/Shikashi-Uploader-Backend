@@ -18,9 +18,8 @@ using System.Threading.Tasks;
 namespace IntegrationTests
 {
     [TestFixture]
-    public class UnitTest1
+    public class EndPointTests
     {
-        private TestServer _server;
         private HttpClient _client;
 
         private readonly HttpClient _externalClient = new HttpClient();

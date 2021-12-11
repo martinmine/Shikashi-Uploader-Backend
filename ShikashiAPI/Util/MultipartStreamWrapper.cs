@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ShikashiAPI
+namespace ShikashiAPI.Util
 {
     public class MultipartStreamWrapper : Stream
     {
