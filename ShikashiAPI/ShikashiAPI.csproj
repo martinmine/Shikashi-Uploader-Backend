@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+	<PublishSingleFile>true</PublishSingleFile>
+	<DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,7 +27,6 @@
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="5.1.0" />
-    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.7.2" />
   </ItemGroup>
 
