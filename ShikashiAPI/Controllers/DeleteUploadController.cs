@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using ShikashiAPI.Policies;
 using ShikashiAPI.Services;
 using System.Threading.Tasks;
-using Serilog;
 using Microsoft.Extensions.Logging;
 
 namespace ShikashiAPI.Controllers

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -9,7 +8,6 @@ using ShikashiAPI.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -26,8 +24,8 @@ namespace IntegrationTests
 
         private const string BasePath = "https://labs.shikashi.me/";
 
-        private const string TestUserEmail = "martin_mine@hotmail.com";
-        private const string TestUserPassword = "qwerty123";
+        private const string TestUserEmail = "test@example.com";
+        private const string TestUserPassword = "password";
 
         [OneTimeSetUp]
         public async Task Initialize()
@@ -51,9 +49,9 @@ namespace IntegrationTests
         {
             var formData = new List<KeyValuePair<string, string>>
             {
-                new KeyValuePair<string, string>("email", email),
-                new KeyValuePair<string, string>("password", password),
-                new KeyValuePair<string, string>("client", "integration-test")
+                new("email", email),
+                new("password", password),
+                new("client", "integration-test")
             };
 
             var content = new FormUrlEncodedContent(formData);
@@ -72,9 +70,9 @@ namespace IntegrationTests
         {
             var myToken = await GetToken("martin_mine@hotmail.com", "qwerty123");
 
-            Assert.NotNull(myToken);
-            Assert.IsNotEmpty(myToken.Key);
-            Assert.Greater(myToken.ExpirationTime, 0);
+            Assert.That(myToken, Is.Not.Null);
+            Assert.That(myToken, Is.Not.Empty);
+            Assert.That(myToken.ExpirationTime, Is.GreaterThan(0));
         }
 
         [Test]
@@ -86,7 +84,7 @@ namespace IntegrationTests
             var responseBody = await request.Content.ReadAsStringAsync();
             var uploads = JsonConvert.DeserializeObject<List<UploadViewModel>>(responseBody);
 
-            Assert.True(uploads.Any(t => t.Key == upload.Key));
+            Assert.That(uploads, Has.Some.Matches<UploadViewModel>(t => t.Key == upload.Key));
         }
 
         [TestCase("TestUploadFile.txt")]
@@ -96,13 +94,13 @@ namespace IntegrationTests
             var uploadRequest = await _externalClient.GetAsync(BasePath + upload.Key);
             var contentType = MimeMapping.Instance.GetMimeType(Path.GetExtension(fileName));
 
-            Assert.AreEqual(contentType, uploadRequest.Content.Headers.ContentType.MediaType);
-            Assert.AreEqual($"\"{fileName}\"", uploadRequest.Content.Headers.ContentDisposition.FileName);
-            Assert.Greater(uploadRequest.Content.Headers.ContentLength, 0);
+            Assert.That(contentType, Is.EqualTo(uploadRequest.Content.Headers.ContentType.MediaType));
+            Assert.That($"\"{fileName}\"", Is.EqualTo(uploadRequest.Content.Headers.ContentDisposition.FileName));
+            Assert.That(uploadRequest.Content.Headers.ContentLength, Is.GreaterThan(0));
 
             var uploadContent = await uploadRequest.Content.ReadAsStringAsync();
 
-            Assert.AreEqual(File.ReadAllText(fileName), uploadContent);
+            Assert.That(File.ReadAllText(fileName), Is.EqualTo(uploadContent));
         }
 
         private async Task<UploadViewModel> UploadFile(string filePath)
@@ -121,7 +119,7 @@ namespace IntegrationTests
 
                 using (var response = await _client.PostAsync("/upload", content))
                 {
-                    Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                    Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
                     var responseBody = await response.Content.ReadAsStringAsync();
                     return JsonConvert.DeserializeObject<UploadViewModel>(responseBody);
@@ -135,10 +133,10 @@ namespace IntegrationTests
             var upload = await UploadFile("TestUploadFile.txt");
 
             var response = await _client.DeleteAsync($"/{upload.Key}/delete");
-            Assert.AreEqual(HttpStatusCode.NoContent, response.StatusCode);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
 
             var s3Response = await _externalClient.GetAsync(BasePath + upload.Key);
-            Assert.AreEqual(HttpStatusCode.NotFound, s3Response.StatusCode);
+            Assert.That(s3Response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         }
 
         private static StreamContent CreateFileContent(Stream fileStream, string fileName, string contentType)
